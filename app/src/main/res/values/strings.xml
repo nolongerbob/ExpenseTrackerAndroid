@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ExpenseTracker</string>
+    
+    <!-- Auth -->
+    <string name="login">Войти</string>
+    <string name="register">Зарегистрироваться</string>
+    <string name="email">Email</string>
+    <string name="password">Пароль</string>
+    <string name="name">Имя</string>
+    <string name="no_account">Нет аккаунта?</string>
+    <string name="have_account">Уже есть аккаунт?</string>
+    
+    <!-- Navigation -->
+    <string name="dashboard">Главная</string>
+    <string name="expenses">Расходы</string>
+    <string name="history">История</string>
+    <string name="notes">Заметки</string>
+    <string name="profile">Профиль</string>
+    
+    <!-- Common -->
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Редактировать</string>
+    <string name="add">Добавить</string>
+    <string name="loading">Загрузка...</string>
+    <string name="error">Ошибка</string>
+    <string name="success">Успешно</string>
+    
+    <!-- Expenses -->
+    <string name="add_expense">Добавить расход</string>
+    <string name="add_income">Добавить доход</string>
+    <string name="edit_expense">Редактировать расход</string>
+    <string name="amount">Сумма</string>
+    <string name="category">Категория</string>
+    <string name="note">Заметка</string>
+    <string name="date">Дата</string>
+    <string name="expense_type_expense">Расход</string>
+    <string name="expense_type_income">Доход</string>
+    
+    <!-- Notes -->
+    <string name="add_note">Добавить заметку</string>
+    <string name="edit_note">Редактировать заметку</string>
+    <string name="title">Название</string>
+    <string name="content">Содержание</string>
+    <string name="reminder">Напоминание</string>
+    <string name="no_notes">Нет заметок</string>
+    
+    <!-- Profile -->
+    <string name="settings">Настройки</string>
+    <string name="logout">Выйти</string>
+    <string name="friends">Друзья</string>
+    <string name="create_post">Создать пост</string>
+    
+    <!-- Onboarding -->
+    <string name="welcome">Добро пожаловать!</string>
+    <string name="get_started">Начать</string>
+    <string name="skip">Пропустить</string>
+</resources>
+
+
