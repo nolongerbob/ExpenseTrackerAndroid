@@ -115,12 +115,14 @@ fun NotesCalendarView(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
+            // Важно: здесь НЕ используем LazyColumn, чтобы не вкладывать её в внешнюю LazyColumn NotesScreen
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(notesForSelectedDate) { note ->
+                notesForSelectedDate.forEach { note ->
                     NoteCard(
                         note = note,
                         onClick = { onNoteTap(note) },
@@ -297,7 +299,8 @@ fun NoteCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         LiquidGlassCard(isLight = isLight) {
             Column {

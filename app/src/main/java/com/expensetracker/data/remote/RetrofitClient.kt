@@ -10,7 +10,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class RetrofitClient(private val preferencesManager: PreferencesManager) {
-    private val BASE_URL = "https://expense-tracker-api-sbxx.onrender.com"
+    // Retrofit требует, чтобы baseUrl заканчивался на "/"
+    private val BASE_URL = "https://expense-tracker-api-sbxx.onrender.com/"
     
     private val authInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()

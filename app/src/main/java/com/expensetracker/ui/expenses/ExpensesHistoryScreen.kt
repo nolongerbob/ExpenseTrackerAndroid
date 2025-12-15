@@ -7,9 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +33,7 @@ import com.expensetracker.ui.utils.AppColors
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import android.app.DatePickerDialog as AndroidDatePickerDialog
 
 enum class TransactionType {
     EXPENSES, INCOME
@@ -407,7 +405,10 @@ fun ExpensesHistoryScreen(
                 
                 // Статистика
                 item {
-                    LiquidGlassCard(isLight = isLight) {
+                    LiquidGlassCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        isLight = isLight
+                    ) {
                         Column {
                             Text(
                                 text = if (selectedTransactionType == TransactionType.EXPENSES) "Всего расходов" else "Всего доходов",
@@ -582,39 +583,57 @@ fun ExpensesHistoryScreen(
         }
     }
     
-    // Date Pickers
+    // Date Pickers (используем системный диалог, чтобы избежать проблем с вложенными LazyColumn)
     if (showStartDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = startDate.time
-        )
-        DatePickerDialog(
-            onDateSelected = { date ->
-                startDate = date
-                showStartDatePicker = false
-            },
-            onDismiss = { showStartDatePicker = false },
-            datePickerState = datePickerState
-        )
+        DisposableEffect(Unit) {
+            val calendar = Calendar.getInstance().apply { time = startDate }
+            val dialog = AndroidDatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    val cal = Calendar.getInstance().apply {
+                        set(year, month, dayOfMonth, 0, 0, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+                    startDate = cal.time
+                    showStartDatePicker = false
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            dialog.setOnDismissListener { showStartDatePicker = false }
+            dialog.show()
+            onDispose { dialog.dismiss() }
+        }
     }
     
     if (showEndDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = endDate.time
-        )
-        DatePickerDialog(
-            onDateSelected = { date ->
-                endDate = date
-                showEndDatePicker = false
-            },
-            onDismiss = { showEndDatePicker = false },
-            datePickerState = datePickerState
-        )
+        DisposableEffect(Unit) {
+            val calendar = Calendar.getInstance().apply { time = endDate }
+            val dialog = AndroidDatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    val cal = Calendar.getInstance().apply {
+                        set(year, month, dayOfMonth, 23, 59, 59)
+                        set(Calendar.MILLISECOND, 999)
+                    }
+                    endDate = cal.time
+                    showEndDatePicker = false
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            dialog.setOnDismissListener { showEndDatePicker = false }
+            dialog.show()
+            onDispose { dialog.dismiss() }
+        }
     }
     
     selectedExpense?.let { expense ->
         ModalBottomSheet(
             onDismissRequest = { selectedExpense = null },
-            containerColor = AppColors.cardBackground(isLight)
+            containerColor = Color.Transparent
         ) {
             EditExpenseScreen(
                 expense = expense,
@@ -625,36 +644,6 @@ fun ExpensesHistoryScreen(
                 }
             )
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialog(
-    onDateSelected: (Date) -> Unit,
-    onDismiss: () -> Unit,
-    datePickerState: DatePickerState
-) {
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        onDateSelected(Date(it))
-                    }
-                }
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Отмена")
-            }
-        }
-    ) {
-        DatePicker(state = datePickerState)
     }
 }
 

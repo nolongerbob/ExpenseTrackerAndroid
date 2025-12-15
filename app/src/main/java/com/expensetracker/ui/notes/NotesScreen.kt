@@ -177,7 +177,7 @@ fun NotesScreen(
     selectedNote?.let { note ->
         ModalBottomSheet(
             onDismissRequest = { selectedNote = null },
-            containerColor = AppColors.cardBackground(isLight)
+            containerColor = Color.Transparent
         ) {
             EditNoteScreen(
                 note = note,

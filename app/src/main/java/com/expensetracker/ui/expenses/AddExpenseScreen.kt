@@ -1,18 +1,26 @@
 package com.expensetracker.ui.expenses
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import com.expensetracker.data.repository.ExpenseRepository
 import com.expensetracker.data.repository.CategoryRepository
 import com.expensetracker.data.local.PreferencesManager
@@ -47,6 +55,7 @@ fun AddExpenseScreen(
     var transactionType by remember { mutableStateOf("EXPENSE") }
     var showCreateCategoryDialog by remember { mutableStateOf(false) }
     var newCategoryName by remember { mutableStateOf("") }
+    var newCategoryColorHex by remember { mutableStateOf("#007AFF") }
     
     val categories by viewModel.categories.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -133,25 +142,47 @@ fun AddExpenseScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    if (categories.isNotEmpty()) {
-                        categories.filter { 
-                            it.type.name == transactionType 
-                        }.forEach { category ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                            ) {
-                                RadioButton(
-                                    selected = selectedCategoryId == category.id,
-                                    onClick = { selectedCategoryId = category.id }
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = category.name,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = AppColors.primaryText(isLight)
-                                )
+                    val filteredCategories = categories.filter {
+                        it.type.name == transactionType
+                    }
+                    if (filteredCategories.isNotEmpty()) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            filteredCategories.forEach { category ->
+                                val selected = selectedCategoryId == category.id
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(
+                                            if (selected) category.getColor().copy(alpha = 0.15f)
+                                            else Color.Transparent
+                                        )
+                                        .clickable { selectedCategoryId = category.id }
+                                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(22.dp)
+                                            .background(category.getColor(), CircleShape)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = category.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = AppColors.primaryText(isLight),
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (selected) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Check,
+                                            contentDescription = "Выбрано",
+                                            tint = AppColors.primaryText(isLight)
+                                        )
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -222,12 +253,59 @@ fun AddExpenseScreen(
             onDismissRequest = { showCreateCategoryDialog = false },
             title = { Text("Новая категория") },
             text = {
-                OutlinedTextField(
-                    value = newCategoryName,
-                    onValueChange = { newCategoryName = it },
-                    label = { Text("Название") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = newCategoryName,
+                        onValueChange = { newCategoryName = it },
+                        label = { Text("Название") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    val iosPalette = listOf(
+                        "#FF3B30", // Red
+                        "#FF9500", // Orange
+                        "#FFCC00", // Yellow
+                        "#34C759", // Green
+                        "#5AC8FA", // Light blue
+                        "#007AFF", // Blue
+                        "#5856D6", // Indigo
+                        "#AF52DE", // Purple
+                        "#FF2D55"  // Pink
+                    )
+
+                    Text(
+                        text = "Цвет",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = AppColors.secondaryText(isLight)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        iosPalette.forEach { hex ->
+                            val color = Color(android.graphics.Color.parseColor(hex))
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(color)
+                                    .border(
+                                        width = if (newCategoryColorHex == hex) 3.dp else 1.dp,
+                                        color = if (newCategoryColorHex == hex) {
+                                            MaterialTheme.colorScheme.onSurface
+                                        } else {
+                                            Color.White.copy(alpha = 0.6f)
+                                        },
+                                        shape = CircleShape
+                                    )
+                                    .clickable { newCategoryColorHex = hex }
+                            )
+                        }
+                    }
+                }
             },
             confirmButton = {
                 Button(
@@ -235,10 +313,11 @@ fun AddExpenseScreen(
                         if (newCategoryName.isNotBlank()) {
                             viewModel.createCategory(
                                 name = newCategoryName,
-                                color = "#007AFF", // Синий цвет по умолчанию
+                                color = newCategoryColorHex,
                                 type = transactionType
                             )
                             newCategoryName = ""
+                            newCategoryColorHex = "#007AFF"
                             showCreateCategoryDialog = false
                         }
                     },

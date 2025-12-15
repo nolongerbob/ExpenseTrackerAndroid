@@ -200,7 +200,7 @@ fun ProfileScreen(
     if (showCreatePost) {
         ModalBottomSheet(
             onDismissRequest = { showCreatePost = false },
-            containerColor = AppColors.cardBackground(isLight)
+            containerColor = Color.Transparent
         ) {
             CreatePostScreen(
                 postRepository = pstRepo,
