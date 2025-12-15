@@ -29,3 +29,5 @@
 -keep class com.expensetracker.data.remote.** { *; }
 
 
+
+

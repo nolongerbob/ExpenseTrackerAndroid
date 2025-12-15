@@ -13,8 +13,9 @@ android {
         applicationId = "com.expensetracker"
         minSdk = 24
         targetSdk = 34
+        // Релизные значения версии приложения
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
